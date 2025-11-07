@@ -11,19 +11,18 @@ function enlargeSkipButton() {
   // Enlarge the skip button to make it more clickable, but not block the player
   const skipButton = document.querySelector(".ytp-skip-ad-button");
 
-  if (!skipButton) {
-    console.warn("Skip button not found");
-    return false;
-  }
-  if (skipButton && skipButton.offsetParent !== null) {
+  if (skipButton) {
     // Only slightly increase size and z-index
     skipButton.style.setProperty("display", "block", "important");
     skipButton.style.transform = "scale(1.5)";
     skipButton.style.zIndex = "9999";
     skipButton.style.opacity = "1";
     // Remove pointerEvents and absolute positioning
+    return true;
+  } else {
+    console.warn("Skip button not found");
+    return false;
   }
-  return true;
 }
 
 function skipAhead(videoAd, seconds = 20) {
