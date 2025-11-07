@@ -1,32 +1,15 @@
-function checkForAd(videoAd) {
+function checkForAd() {
   // Check if the ad is visible
-  if (
-    videoAd &&
-    videoAd.offsetParent !== null && // element is not `display: none`
-    videoAd.getBoundingClientRect().height > 0 // element takes up space
-  ) {
+  videoAd = document.querySelector(".ytp-ad-player-overlay-layout");
+  if (videoAd) {
     return true;
   }
   return false;
 }
 
-function skipAd() {
-  console.log("Attempting to skip ad...");
-  const skipButton =
-    document.querySelector(".ytp-skip-ad-button") ||
-    document.querySelector("#ytp-skip-ad-button");
-
-  if (skipButton) {
-    console.log("Skip button");
-    skipButton.click();
-  }
-}
-
 function enlargeSkipButton() {
   // Enlarge the skip button to make it more clickable, but not block the player
-  const skipButton =
-    document.querySelector(".ytp-skip-ad-button") ||
-    document.querySelector("#ytp-skip-ad-button");
+  const skipButton = document.querySelector(".ytp-skip-ad-button");
 
   if (!skipButton) {
     console.warn("Skip button not found");
@@ -46,10 +29,10 @@ function enlargeSkipButton() {
 function skipAhead(videoAd, seconds = 20) {
   try {
     const target = Math.min(
-      video.duration || Infinity,
-      video.currentTime + seconds
+      videoAd.duration || Infinity,
+      videoAd.currentTime + seconds
     );
-    video.currentTime = target;
+    videoAd.currentTime = target;
     console.log(`Skipped ahead ${seconds} seconds`);
     return true;
   } catch (e) {
@@ -59,9 +42,10 @@ function skipAhead(videoAd, seconds = 20) {
 }
 
 function startObserver() {
+  const videoAd = document.querySelector(".video-stream html5-main-video");
   if (location.hostname === "www.youtube.com") {
     let throttleTimeout;
-    const throttleDelay = 100; // 100 ms
+    const throttleDelay = 1000; // 1000 ms
     const observer = new MutationObserver((mutations) => {
       if (throttleTimeout) return; // Skip if already waiting
       throttleTimeout = window.setTimeout(() => {
@@ -69,16 +53,13 @@ function startObserver() {
 
         for (const mutation of mutations) {
           if (mutation.type === "childList") {
-            const videoAd = document.querySelector(
-              ".video-stream.html5-main-video"
-            );
-            if (checkForAd(videoAd)) {
-              skipAd(videoAd);
-              // If enlargeSkipButton can't find a skip button, jump the video 20s forward
+            if (checkForAd()) {
+              skipAhead(videoAd, 20);
+
               if (!enlargeSkipButton()) {
-                skipAhead(videoAd, 20);
+                console.warn("Could not enlarge skip button");
               }
-            } else if (!checkForAd(videoAd)) {
+              console.log("Worked!!");
             }
           }
         }
@@ -95,3 +76,4 @@ if (document.body) {
 } else {
   window.addEventListener("DOMContentLoaded", startObserver);
 }
+hey;
