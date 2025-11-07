@@ -76,4 +76,3 @@ if (document.body) {
 } else {
   window.addEventListener("DOMContentLoaded", startObserver);
 }
-hey;
